@@ -103,12 +103,12 @@ def generate_via(start_metal, end_metal, w, h):
         else:
             h = via_rules[via-1][0] + 2*via_rules[via-1][2]
             
-        # if both are at minimum increase one
-        if not w_ok and not h_ok:
+        # if both are at minimum increase one dimension to fit 2 vias
+        if (w < 2*via_rules[via-1][0] + via_rules[via-1][1] + 2*via_rules[via-1][2]) and (h < 2*via_rules[via-1][0] + via_rules[via-1][1] + 2*via_rules[via-1][2]):
             if wide:
-                w = w + via_rules[via-1][1]
+                w = 2*via_rules[via-1][0] + via_rules[via-1][1] + 2*via_rules[via-1][2]
             else:
-                h = h  + via_rules[via-1][1]
+                h = 2*via_rules[via-1][0] + via_rules[via-1][1] + 2*via_rules[via-1][2]
         
         
         # number of vias that can fit horizontally/vertically
