@@ -6,10 +6,12 @@ This Python script controlled with a GUI is used to generate layout of vias or v
 I needed these on an Ubuntu machine.
 
   Packages:
+  
     qt5-default (installed via 'apt')
     opencv--python (installed via 'pip')
     
   Other:
+  
     Make sure your .magicrc file is present in the location of this script.
  
  UI elements:
