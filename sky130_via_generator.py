@@ -176,6 +176,7 @@ def update_log(text):
     global log_text
     log_text = log_text + text + "\n"
     ui.log.setText(log_text)
+    ui.log.verticalScrollBar().setValue(ui.log.verticalScrollBar().maximum())
     
 def open_licence():
     Licence.show()
