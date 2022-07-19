@@ -24,6 +24,7 @@
 import sys
 import pathlib
 import os as os
+import time
 
 from PyQt5 import QtCore, QtWidgets, QtGui
 
@@ -31,22 +32,22 @@ from PyQt5 import QtCore, QtWidgets, QtGui
 
 # via1 rules
 via1w = 26 # minimal width (square via)
-via1d = 32 # minimal distance between 2 vias (from lower left corner of one to another)
+via1d = 6 # minimal distance between 2 vias
 via1b = 3 # minimal distance to m1 and m2 border
 
 # via2 rules
 via2w = 28
-via2d = 40
+via2d = 12
 via2b = 5
 
 # via3 rules
 via3w = 32
-via3d = 40
+via3d = 16
 via3b = 5
 
 # via4 rules
 via4w = 118
-via4d = 160
+via4d = 52
 via4b = 12
 
 via_rules = []
@@ -58,12 +59,6 @@ via_rules.append([via4w, via4d, via4b])
 log_text = ""
 
 def generate_via(start_metal, end_metal, w, h):
-    if not os.path.exists(str(pathlib.Path(__file__).parent.resolve()) + '/.magicrc'):
-        update_log('Place your .magicrc file in the same path as this script.')
-        return
-    
-    start_metal = start_metal + 1
-    end_metal = end_metal + 1
     try:
         w = int(w)
         h = int(h)
@@ -76,9 +71,11 @@ def generate_via(start_metal, end_metal, w, h):
         return
     
     
-    # array for holding commands in strings
-    commands = []
-    commands.append('magic -dnull -noconsole << EOF')
+    # array for holding mag_lines in strings
+    mag_lines = []
+    mag_lines.append('magic')
+    mag_lines.append('tech sky130B')
+    mag_lines.append('timestamp ' + str(int(time.time())))
     
     via_array = []
     for i in range(start_metal, end_metal):
@@ -87,59 +84,52 @@ def generate_via(start_metal, end_metal, w, h):
         via_array[0] = via_array[-1]
         via_array[-1] = t
     
+    checkpaint_flag = False
     # start from highest metal so that the via dimensions can be adjusted according to the worst condition for size of the topmost layer
     for via in via_array:
-        # check if 1 via can fit horizontally and vertically
-        w_ok = False
-        h_ok = False
-        wide = w > h
         
-        if w > via_rules[via-1][0] + 2*via_rules[via-1][2]:
-            w_ok = True
-        else:
+        # make sure 1 via can fit horizontally and vertically
+        if w < via_rules[via-1][0] + 2*via_rules[via-1][2]:
             w = via_rules[via-1][0] + 2*via_rules[via-1][2]
-        if h > via_rules[via-1][0] + 2*via_rules[via-1][2]:
-            h_ok = True
-        else:
+        if h < via_rules[via-1][0] + 2*via_rules[via-1][2]:
             h = via_rules[via-1][0] + 2*via_rules[via-1][2]
-            
-        # if both are at minimum increase one dimension to fit 2 vias
+        
+        wide = w > h
+        # if both dimensions can't fit two vias increase one dimension to fit 2 vias, keep bigger dimension bigger
         if (w < 2*via_rules[via-1][0] + via_rules[via-1][1] + 2*via_rules[via-1][2]) and (h < 2*via_rules[via-1][0] + via_rules[via-1][1] + 2*via_rules[via-1][2]):
             if wide:
                 w = 2*via_rules[via-1][0] + via_rules[via-1][1] + 2*via_rules[via-1][2]
             else:
                 h = 2*via_rules[via-1][0] + via_rules[via-1][1] + 2*via_rules[via-1][2]
         
+        if not checkpaint_flag:
+            checkpaint_flag = True
+            mag_lines.append('<< checkpaint >>')
+            mag_lines.append('rect -630 -630 ' + str(w+630) + ' ' + str(h+630))
         
         # number of vias that can fit horizontally/vertically
-        w_num_vias = (w - 2*via_rules[via-1][2] + via_rules[via-1][1] - via_rules[via-1][0])//via_rules[via-1][1]
-        h_num_vias = (h - 2*via_rules[via-1][2] + via_rules[via-1][1] - via_rules[via-1][0])//via_rules[via-1][1]
+        w_num_vias = (w + via_rules[via-1][1] - 2*via_rules[via-1][2])//(via_rules[via-1][0] + via_rules[via-1][1])
+        h_num_vias = (h + via_rules[via-1][1] - 2*via_rules[via-1][2])//(via_rules[via-1][0] + via_rules[via-1][1])
         
         # start of lowest leftmost via
-        w_start = (w - w_num_vias*via_rules[via-1][1] + (via_rules[via-1][1] - via_rules[via-1][0]))//2
-        h_start = (h - h_num_vias*via_rules[via-1][1] + (via_rules[via-1][1] - via_rules[via-1][0]))//2
+        w_start = (w - (w_num_vias*via_rules[via-1][0] + (w_num_vias-1)*via_rules[via-1][1]))//2
+        h_start = (h - (h_num_vias*via_rules[via-1][0] + (h_num_vias-1)*via_rules[via-1][1]))//2
         
-        # paint required metals
-        commands.append('box size ' + str(w) + ' ' + str(h))
-        commands.append('paint m' + str(via))
-        commands.append('paint m' + str(via + 1))
+        # add top metal for current via
+        mag_lines.append('<< metal' + str(via+1) + ' >>')
+        mag_lines.append('rect 0 0 ' + str(w) + ' ' + str(h))
         
-        # set box size and move to starting location
-        commands.append('box size ' + str(via_rules[via-1][0]) + ' ' + str(via_rules[via-1][0]))
-        commands.append('move u ' + str(h_start))
-        commands.append('move r ' + str(w_start))
-        
-        # move and paint all vias
+        # add vias
+        mag_lines.append('<< via' + str(via) + ' >>')
         for i in range(h_num_vias):
             for j in range(w_num_vias):
-                commands.append('paint v' + str(via))
-                commands.append('move r ' + str(via_rules[via-1][1]))
-            commands.append('move l ' + str(via_rules[via-1][1]*w_num_vias))
-            commands.append('move u ' + str(via_rules[via-1][1]))
-            
-        # reset cursor box position
-        commands.append('move d ' + str(via_rules[via-1][1]*h_num_vias + h_start))
-        commands.append('move l ' + str(w_start))
+                mag_lines.append('rect ' + str(w_start + (via_rules[via-1][0] + via_rules[via-1][1])*j) + ' ' + str(h_start + (via_rules[via-1][0] + via_rules[via-1][1])*i) + ' ' + str(w_start + via_rules[via-1][0] + (via_rules[via-1][0] + via_rules[via-1][1])*j) + ' ' + str(h_start + via_rules[via-1][0] + (via_rules[via-1][0] + via_rules[via-1][1])*i))
+    
+    # add lowest metal
+    mag_lines.append('<< metal' + str(via_array[-1]) + ' >>')
+    mag_lines.append('rect 0 0 ' + str(w) + ' ' + str(h))
+    
+    mag_lines.append('<< end >>')
     
     # make via name and check if same exists
     via_name = 'viaM' + str(start_metal) + 'M' + str(end_metal) + 'W' + str(w) + 'H' + str(h) + '.mag'
@@ -153,19 +143,10 @@ def generate_via(start_metal, end_metal, w, h):
     if not os.path.exists(via_path):
         os.makedirs(via_path)
 
-    commands.append('save ' + via_path + '/' + via_name)
-    commands.append('quit -noprompt')
-    commands.append('EOF')
-    
-    # generate temporary magic shell script, run it and delete it afterwards
-    script_name = 'temp.sh'
-    with open(script_name, 'w') as f:
-        for command in commands:
-            f.write(command + '\n')
-        
-    os.system('chmod +x ' + script_name)
-    os.system('./' + script_name)
-    os.system('rm ' + script_name)
+    # generate .mag file
+    with open(via_name, 'w') as f:
+        for line in mag_lines:
+            f.write(line + '\n')
             
     update_log("Generated via M" + str(start_metal) + "-M" + str(end_metal) + " of size [" + str(w) + ", " + str(h) + "] at " + via_path + '/' + via_name)
     
@@ -180,7 +161,6 @@ def update_log(text):
     
 def open_licence():
     Licence.show()
-    
     try:
         with open('LICENCE') as f:
             ui_licence.textBrowser.setPlainText(f.read())
@@ -318,7 +298,7 @@ if __name__ == "__main__":
     ui.destPath.setTabChangesFocus(True)
     
     # add action to generateButton
-    ui.generateButton.clicked.connect(lambda:generate_via(ui.startLayer.currentIndex() , ui.endLayer.currentIndex(), ui.width.toPlainText(), ui.height.toPlainText()))
+    ui.generateButton.clicked.connect(lambda:generate_via(ui.startLayer.currentIndex()+1, ui.endLayer.currentIndex()+1, ui.width.toPlainText(), ui.height.toPlainText()))
     
     # add action to Licence
     ui.actionLicence.triggered.connect(lambda:open_licence())
@@ -332,8 +312,9 @@ if __name__ == "__main__":
     update_log('For details about the licence check the About section.')
     update_log('')
     update_log('This program is used to generate .mag files of vias for sky130 technology.')
-    update_log('Make sure your .magicrc file is present in the location of the script.')
+    update_log('Input your via requirements above.')
     update_log('')
 
     MainWindow.show()
     sys.exit(app.exec_())
+
