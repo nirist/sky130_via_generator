@@ -2,7 +2,7 @@
 
 This Python script controlled with a GUI is used to generate layout of vias or via stacks for metals 1 through 5 in a form of .mag files for usage in the magIC VLSI layout tool with the open source SkyWater 130nm technology. The vias/via stacks are DRC clean and feature at least two vias between all of needed metal layers for the via or via stack in the layout for ensuring a better yield.
 
-![alt text](./images/ui_image.jpg?raw=true)
+![UI image](./images/ui_image.png?raw=true)
 
 # Prerequisites:
 
