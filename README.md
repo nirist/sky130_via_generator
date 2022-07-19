@@ -36,5 +36,5 @@ Make sure your .magicrc file is present in the location of this script.
   Generate - Click this button when you are ready to generate specified via.
   
   
-  Log - Text log of all actions and errors. Wipes on script end.
+  Log - Text log of all actions and errors. Not saved locally, wipes on script end.
  
