@@ -35,7 +35,7 @@ via1d = 32 # minimal distance between 2 vias (from lower left corner of one to a
 via1b = 3 # minimal distance to m1 and m2 border
 
 # via2 rules
-via2w = 26
+via2w = 28
 via2d = 40
 via2b = 5
 
