@@ -4,11 +4,9 @@ This Python script controlled with a GUI is used to generate layout of vias or v
 
 # Prerequisites:
 
-A functional magIC layout tool that is set up with the SkyWater 130nm technology.
+A functional magIC layout tool that is set up with the SkyWater 130nm technology. Make sure your .magicrc file is present in the location of this script.
 
-I needed these on an Ubuntu machine.
-
-  Packages:
+I needed these packages on an Ubuntu machine:
   
 qt5-default (installed via 'apt')
     
@@ -17,10 +15,9 @@ qt5-default (installed via 'apt')
 opencv--python (installed via 'pip')
 
     pip install opencv--python
-    
-  Other:
+
   
-Make sure your .magicrc file is present in the location of this script.
+
  
 # UI elements:
 
