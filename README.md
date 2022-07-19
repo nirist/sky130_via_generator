@@ -27,7 +27,7 @@ opencv--python (installed via 'pip')
   Start/End layer - Used to set the start and end layer of via or via stack, metals 1 through 5 are supported. Start layer must be lower than end layer.
   
   
-  Width/Height - Used to set the dimensions of the via or via stack. If a via of set dimensions can't be made DRC clean or it would require only one via of any needed type of vias the dimensions will be increased to make DRC clean and/or fit at least two vias of any needed type for set start and end layers.
+  Width/Height - Used to set the dimensions of the via or via stack. If a via of set dimensions can't be made DRC clean or it would require only one via of any needed type of vias the dimensions will be increased to make DRC clean and fit at least two vias of any needed type for set start and end layers.
   
   
   Generate - Click this button when you are ready to generate specified via.
