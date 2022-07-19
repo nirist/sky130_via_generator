@@ -1,9 +1,31 @@
 #!/usr/bin/env python3
+
+"""
+    This Python script controlled with a GUI is used to generate layout
+    of vias or via stacks for usage in the magIC VLSI layout tool with
+    the open source SkyWater 130nm technology.
+    
+    Copyright (C) 2022 Nikola Ristic https://github.com/nirist
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+"""
+
 import sys
 import pathlib
 import os as os
 
-from PyQt5 import QtCore, QtWidgets
+from PyQt5 import QtCore, QtWidgets, QtGui
 
 # ---------------------- DRC RULES FOR VIAS ----------------------
 
@@ -154,92 +176,141 @@ def update_log(text):
     global log_text
     log_text = log_text + text + "\n"
     ui.log.setText(log_text)
+    
+def open_licence():
+    Licence.show()
+    
+    try:
+        with open('LICENCE') as f:
+            ui_licence.textBrowser.setPlainText(f.read())
+    except FileNotFoundError:
+        ui_licence.textBrowser.setPlainText('LICENCE file not found. View licence at https://www.gnu.org/licenses/gpl-3.0.html')
+      
 
-class Ui_Dialog(object):
-    def setupUi(self, Dialog):
-        Dialog.setObjectName("Dialog")
-        Dialog.resize(400, 460)
-        self.startLayer = QtWidgets.QComboBox(Dialog)
-        self.startLayer.setGeometry(QtCore.QRect(10, 100, 71, 25))
-        self.startLayer.setObjectName("startLayer")
-        self.startLayer.addItem("")
-        self.startLayer.addItem("")
-        self.startLayer.addItem("")
-        self.startLayer.addItem("")
-        self.startLayer.addItem("")
-        self.endLayer = QtWidgets.QComboBox(Dialog)
-        self.endLayer.setGeometry(QtCore.QRect(150, 100, 71, 25))
+class Ui_MainWindow(object):
+    def setupUi(self, MainWindow):
+        MainWindow.setObjectName("MainWindow")
+        MainWindow.resize(496, 544)
+        self.centralwidget = QtWidgets.QWidget(MainWindow)
+        self.centralwidget.setObjectName("centralwidget")
+        self.height = QtWidgets.QPlainTextEdit(self.centralwidget)
+        self.height.setGeometry(QtCore.QRect(160, 150, 71, 25))
+        self.height.setObjectName("height")
+        self.label_4 = QtWidgets.QLabel(self.centralwidget)
+        self.label_4.setGeometry(QtCore.QRect(20, 130, 51, 21))
+        self.label_4.setObjectName("label_4")
+        self.endLayer = QtWidgets.QComboBox(self.centralwidget)
+        self.endLayer.setGeometry(QtCore.QRect(160, 100, 71, 25))
         self.endLayer.setObjectName("endLayer")
         self.endLayer.addItem("")
         self.endLayer.addItem("")
         self.endLayer.addItem("")
         self.endLayer.addItem("")
         self.endLayer.addItem("")
-        self.label = QtWidgets.QLabel(Dialog)
-        self.label.setGeometry(QtCore.QRect(10, 80, 80, 21))
-        self.label.setObjectName("label")
-        self.label_2 = QtWidgets.QLabel(Dialog)
-        self.label_2.setGeometry(QtCore.QRect(150, 80, 80, 21))
+        self.label_2 = QtWidgets.QLabel(self.centralwidget)
+        self.label_2.setGeometry(QtCore.QRect(160, 80, 71, 21))
         self.label_2.setObjectName("label_2")
-        self.generateButton = QtWidgets.QPushButton(Dialog)
-        self.generateButton.setGeometry(QtCore.QRect(10, 190, 75, 23))
-        self.generateButton.setObjectName("generateButton")
-        self.width = QtWidgets.QPlainTextEdit(Dialog)
-        self.width.setGeometry(QtCore.QRect(10, 150, 71, 25))
-        self.width.setObjectName("width")
-        self.height = QtWidgets.QPlainTextEdit(Dialog)
-        self.height.setGeometry(QtCore.QRect(150, 150, 71, 25))
-        self.height.setObjectName("height")
-        self.label_3 = QtWidgets.QLabel(Dialog)
-        self.label_3.setGeometry(QtCore.QRect(150, 130, 61, 21))
+        self.label_3 = QtWidgets.QLabel(self.centralwidget)
+        self.label_3.setGeometry(QtCore.QRect(160, 130, 61, 21))
         self.label_3.setObjectName("label_3")
-        self.label_4 = QtWidgets.QLabel(Dialog)
-        self.label_4.setGeometry(QtCore.QRect(10, 130, 51, 21))
-        self.label_4.setObjectName("label_4")
-        self.log = QtWidgets.QTextBrowser(Dialog)
-        self.log.setGeometry(QtCore.QRect(10, 240, 380, 200))
-        self.log.setObjectName("log")
-        self.label_5 = QtWidgets.QLabel(Dialog)
-        self.label_5.setGeometry(QtCore.QRect(10, 220, 47, 21))
-        self.label_5.setObjectName("label_5")
-        self.destPath = QtWidgets.QPlainTextEdit(Dialog)
-        self.destPath.setGeometry(QtCore.QRect(10, 30, 380, 40))
+        self.destPath = QtWidgets.QPlainTextEdit(self.centralwidget)
+        self.destPath.setGeometry(QtCore.QRect(20, 30, 451, 31))
         self.destPath.setObjectName("destPath")
-        self.label_6 = QtWidgets.QLabel(Dialog)
-        self.label_6.setGeometry(QtCore.QRect(10, 10, 150, 21))
+        self.width = QtWidgets.QPlainTextEdit(self.centralwidget)
+        self.width.setGeometry(QtCore.QRect(20, 150, 71, 25))
+        self.width.setObjectName("width")
+        self.startLayer = QtWidgets.QComboBox(self.centralwidget)
+        self.startLayer.setGeometry(QtCore.QRect(20, 100, 71, 25))
+        self.startLayer.setObjectName("startLayer")
+        self.startLayer.addItem("")
+        self.startLayer.addItem("")
+        self.startLayer.addItem("")
+        self.startLayer.addItem("")
+        self.startLayer.addItem("")
+        self.generateButton = QtWidgets.QPushButton(self.centralwidget)
+        self.generateButton.setGeometry(QtCore.QRect(20, 190, 75, 23))
+        self.generateButton.setObjectName("generateButton")
+        self.label = QtWidgets.QLabel(self.centralwidget)
+        self.label.setGeometry(QtCore.QRect(20, 80, 71, 21))
+        self.label.setObjectName("label")
+        self.log = QtWidgets.QTextBrowser(self.centralwidget)
+        self.log.setGeometry(QtCore.QRect(20, 240, 451, 241))
+        self.log.setObjectName("log")
+        self.label_5 = QtWidgets.QLabel(self.centralwidget)
+        self.label_5.setGeometry(QtCore.QRect(20, 220, 47, 20))
+        self.label_5.setObjectName("label_5")
+        self.label_6 = QtWidgets.QLabel(self.centralwidget)
+        self.label_6.setGeometry(QtCore.QRect(20, 10, 101, 21))
         self.label_6.setObjectName("label_6")
+        MainWindow.setCentralWidget(self.centralwidget)
+        self.menubar = QtWidgets.QMenuBar(MainWindow)
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 496, 21))
+        self.menubar.setObjectName("menubar")
+        self.menuAbout = QtWidgets.QMenu(self.menubar)
+        self.menuAbout.setObjectName("menuAbout")
+        MainWindow.setMenuBar(self.menubar)
+        self.statusbar = QtWidgets.QStatusBar(MainWindow)
+        self.statusbar.setObjectName("statusbar")
+        MainWindow.setStatusBar(self.statusbar)
+        self.actionLicence = QtWidgets.QAction(MainWindow)
+        self.actionLicence.setObjectName("actionLicence")
+        self.menuAbout.addAction(self.actionLicence)
+        self.menubar.addAction(self.menuAbout.menuAction())
 
-        self.retranslateUi(Dialog)
-        QtCore.QMetaObject.connectSlotsByName(Dialog)
+        self.retranslateUi(MainWindow)
+        QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
-    def retranslateUi(self, Dialog):
+    def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        Dialog.setWindowTitle(_translate("Dialog", "magIC via generator"))
-        Dialog.windowIcon()
-        self.startLayer.setItemText(0, _translate("Dialog", "M1"))
-        self.startLayer.setItemText(1, _translate("Dialog", "M2"))
-        self.startLayer.setItemText(2, _translate("Dialog", "M3"))
-        self.startLayer.setItemText(3, _translate("Dialog", "M4"))
-        self.startLayer.setItemText(4, _translate("Dialog", "M5"))
-        self.endLayer.setItemText(0, _translate("Dialog", "M1"))
-        self.endLayer.setItemText(1, _translate("Dialog", "M2"))
-        self.endLayer.setItemText(2, _translate("Dialog", "M3"))
-        self.endLayer.setItemText(3, _translate("Dialog", "M4"))
-        self.endLayer.setItemText(4, _translate("Dialog", "M5"))
-        self.label.setText(_translate("Dialog", "Start layer:"))
-        self.label_2.setText(_translate("Dialog", "End layer:"))
-        self.generateButton.setText(_translate("Dialog", "Generate"))
-        self.label_3.setText(_translate("Dialog", "Height:"))
-        self.label_4.setText(_translate("Dialog", "Width:"))
-        self.label_5.setText(_translate("Dialog", "Log:"))
-        self.label_6.setText(_translate("Dialog", "Destination path:"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "sky130_via_generator"))
+        self.label_4.setText(_translate("MainWindow", "Width:"))
+        self.endLayer.setItemText(0, _translate("MainWindow", "M1"))
+        self.endLayer.setItemText(1, _translate("MainWindow", "M2"))
+        self.endLayer.setItemText(2, _translate("MainWindow", "M3"))
+        self.endLayer.setItemText(3, _translate("MainWindow", "M4"))
+        self.endLayer.setItemText(4, _translate("MainWindow", "M5"))
+        self.label_2.setText(_translate("MainWindow", "End layer:"))
+        self.label_3.setText(_translate("MainWindow", "Height:"))
+        self.startLayer.setItemText(0, _translate("MainWindow", "M1"))
+        self.startLayer.setItemText(1, _translate("MainWindow", "M2"))
+        self.startLayer.setItemText(2, _translate("MainWindow", "M3"))
+        self.startLayer.setItemText(3, _translate("MainWindow", "M4"))
+        self.startLayer.setItemText(4, _translate("MainWindow", "M5"))
+        self.generateButton.setText(_translate("MainWindow", "Generate"))
+        self.label.setText(_translate("MainWindow", "Start layer:"))
+        self.label_5.setText(_translate("MainWindow", "Log:"))
+        self.label_6.setText(_translate("MainWindow", "Destination path:"))
+        self.menuAbout.setTitle(_translate("MainWindow", "About"))
+        self.actionLicence.setText(_translate("MainWindow", "Licence"))
         
+class Ui_Licence(object):
+    def setupUi(self, Licence):
+        Licence.setObjectName("Licence")
+        Licence.resize(490, 658)
+        self.textBrowser = QtWidgets.QPlainTextEdit(Licence)
+        self.textBrowser.setGeometry(QtCore.QRect(10, 10, 471, 641))
+        self.textBrowser.setObjectName("textBrowser")
+
+        self.retranslateUi(Licence)
+        QtCore.QMetaObject.connectSlotsByName(Licence)
+
+    def retranslateUi(self, Licence):
+        _translate = QtCore.QCoreApplication.translate
+        Licence.setWindowTitle(_translate("Licence", "Licence"))
+
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
-    Dialog = QtWidgets.QDialog()
-    ui = Ui_Dialog()
-    ui.setupUi(Dialog)
     
+    # Main
+    MainWindow = QtWidgets.QMainWindow()
+    ui = Ui_MainWindow()
+    ui.setupUi(MainWindow)
+    
+    # Licence
+    Licence = QtWidgets.QWidget()
+    ui_licence = Ui_Licence()
+    ui_licence.setupUi(Licence)
+
     # make Tab not type \t for easy manuverability with keyboard
     ui.width.setTabChangesFocus(True)
     ui.height.setTabChangesFocus(True)
@@ -248,13 +319,20 @@ if __name__ == "__main__":
     # add action to generateButton
     ui.generateButton.clicked.connect(lambda:generate_via(ui.startLayer.currentIndex() , ui.endLayer.currentIndex(), ui.width.toPlainText(), ui.height.toPlainText()))
     
+    # add action to Licence
+    ui.actionLicence.triggered.connect(lambda:open_licence())
     # fill path with current run path of script on start
     script_path = pathlib.Path(__file__).parent.resolve()
     ui.destPath.setPlainText(str(script_path))
        
-    update_log('This python script is used to generate .mag files of vias for sky130 technology.')
+    update_log('sky130_via_generator Copyright (C) 2022 Nikola Ristic https://github.com/nirist')
+    update_log('This program comes with ABSOLUTELY NO WARRANTY.')
+    update_log('This is free software, and you are welcome to redistribute it under certain conditions.')
+    update_log('For details about the licence check the About section.')
+    update_log('')
+    update_log('This program is used to generate .mag files of vias for sky130 technology.')
     update_log('Make sure your .magicrc file is present in the location of the script.')
     update_log('')
 
-    Dialog.show()
+    MainWindow.show()
     sys.exit(app.exec_())
