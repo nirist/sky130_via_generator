@@ -8,10 +8,7 @@ This Python script controlled with a GUI is used to generate layout of vias or v
 
 # Prerequisites:
 
-A functional magIC layout tool that is set up with the SkyWater 130nm technology. Make sure your .magicrc file is present in the location of this script.
 
-I needed these packages on an Ubuntu machine:
-  
 qt5-default (installed via 'apt')
     
     apt install qt5-default
