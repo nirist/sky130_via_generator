@@ -71,7 +71,7 @@ def generate_via(start_metal, end_metal, w, h):
         return
     
     
-    # array for holding mag_lines in strings
+    # array for holding lines for .mag file
     mag_lines = []
     mag_lines.append('magic')
     mag_lines.append('tech sky130B')
