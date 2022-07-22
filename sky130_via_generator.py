@@ -144,7 +144,7 @@ def generate_via(start_metal, end_metal, w, h):
         os.makedirs(via_path)
 
     # generate .mag file
-    with open(via_name, 'w') as f:
+    with open(via_path + '/' + via_name, 'w') as f:
         for line in mag_lines:
             f.write(line + '\n')
             
