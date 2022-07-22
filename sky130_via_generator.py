@@ -155,17 +155,17 @@ def generate_via(start_metal, end_metal, w, h):
     
 def update_log(text):
     global log_text
-    log_text = log_text + text + "\n"
+    log_text = log_text + text + "<br/>"
     ui.log.setText(log_text)
     ui.log.verticalScrollBar().setValue(ui.log.verticalScrollBar().maximum())
     
 def open_licence():
     Licence.show()
     try:
-        with open('LICENCE') as f:
-            ui_licence.textBrowser.setPlainText(f.read())
+        with open('LICENSE') as f:
+            ui_licence.textBrowser.setText(f.read())
     except FileNotFoundError:
-        ui_licence.textBrowser.setPlainText('LICENCE file not found. View licence at https://www.gnu.org/licenses/gpl-3.0.html')
+        ui_licence.textBrowser.setText('LICENSE file not found. View licence at <a href=https://www.gnu.org/licenses/gpl-3.0.html>https://www.gnu.org/licenses/gpl-3.0.html</a>')
       
 
 class Ui_MainWindow(object):
@@ -268,7 +268,7 @@ class Ui_Licence(object):
     def setupUi(self, Licence):
         Licence.setObjectName("Licence")
         Licence.resize(490, 658)
-        self.textBrowser = QtWidgets.QPlainTextEdit(Licence)
+        self.textBrowser = QtWidgets.QTextBrowser(Licence)
         self.textBrowser.setGeometry(QtCore.QRect(10, 10, 471, 641))
         self.textBrowser.setObjectName("textBrowser")
 
@@ -306,7 +306,7 @@ if __name__ == "__main__":
     script_path = pathlib.Path(__file__).parent.resolve()
     ui.destPath.setPlainText(str(script_path))
        
-    update_log('sky130_via_generator Copyright (C) 2022 Nikola Ristic https://github.com/nirist')
+    update_log('sky130_via_generator Copyright (C) 2022 Nikola Ristic <a href=https://github.com/nirist>https://github.com/nirist</a>')
     update_log('This program comes with ABSOLUTELY NO WARRANTY.')
     update_log('This is free software, and you are welcome to redistribute it under certain conditions.')
     update_log('For details about the licence check the About section.')
