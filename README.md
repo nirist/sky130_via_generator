@@ -36,3 +36,7 @@ opencv--python (installed via 'pip')
   
   Log - Text log of all actions and errors. Not saved locally, wipes on script end.
  
+# Further work and features:
+
+  Image preview of specified via.
+  Specify via/via stack with number of vias per layer (while still keeping the current option of specifying with dimensions).
