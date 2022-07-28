@@ -79,10 +79,7 @@ def generate_via(start_metal, end_metal, w, h):
     
     via_array = []
     for i in range(start_metal, end_metal):
-        via_array.append(i)
-        t = via_array[0]
-        via_array[0] = via_array[-1]
-        via_array[-1] = t
+        via_array.insert(0, i)
     
     checkpaint_flag = False
     # start from highest metal so that the via dimensions can be adjusted according to the worst condition for size of the topmost layer
